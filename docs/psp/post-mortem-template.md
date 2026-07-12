@@ -24,7 +24,7 @@ Qué se planeó hacer en este hito y qué se logró, en 2–4 frases.
 
 ## Defectos por fase
 
-Resumen de las filas de [`../defect-log.md`](../defect-log.md) correspondientes a este periodo:
+Resumen de las filas de [`defect-log.md`](defect-log.md) correspondientes a este periodo:
 cuántos defectos, en qué fase se inyectaron mayoritariamente, en qué fase se detectaron, y si hay
 un patrón (p. ej. "todos los defectos de Environment/Config se detectan en Test, nunca antes").
 

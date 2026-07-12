@@ -18,7 +18,7 @@
 | RF-001 — Ingesta DICOM de mamografía 2D | — | — | `services/mammography` | — | Propuesto |
 | RF-002 — Clasificación mamografía 2D (CBIS-DDSM, transfer learning) | — | — | `services/mammography` | — | Propuesto |
 | RF-003 — Explicabilidad Grad-CAM sobre mamografía | — | — | `services/mammography` | — | Propuesto |
-| RF-004 — Orquestación multiagente vía gateway | — | — | `services/gateway` | Tests 12/12 del andamiaje mock | Implementado parcial |
+| RF-004 — Orquestación multiagente vía gateway | — | — | `services/gateway` | Test de orquestación del gateway (andamiaje mock) | Implementado parcial |
 | RF-005 — Servicio de fusión multimodal | — | — | `services/fusion` | Tests del andamiaje mock (promedio) | Implementado (mock) |
 | RF-006 — Correlación histopatológica (BreakHis/TCGA-BRCA) | — | — | `services/histopathology` | — | Propuesto (trabajo futuro) |
 | RF-007 — Endpoint interoperable HL7 FHIR / SNOMED CT | — | — | `services/gateway` | — | Propuesto |

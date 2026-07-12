@@ -81,4 +81,4 @@ Cuando la rama implementa un issue concreto, se puede sufijar el número: `feat/
 
 - [`psp-methodology.md`](psp-methodology.md) — fase PSP ↔ artefacto.
 - [`definition-of-ready.md`](definition-of-ready.md) / [`definition-of-done.md`](definition-of-done.md)
-- [`../../CONTRIBUTING.md`](../../CONTRIBUTING.md) (cuando exista) — guía de contribución completa.
+- [`../../CONTRIBUTING.md`](../../CONTRIBUTING.md) — guía de contribución completa.
