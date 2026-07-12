@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Valida la convención de commits de mama-detector.
+# Formato: tipo(#N): descripción   |   tipo: descripción
+# tipo ∈ feat|fix|chore|docs|refactor|style|test ; (#N) opcional = issue de GitHub.
+set -euo pipefail
+msg_file="$1"
+first_line="$(head -n1 "$msg_file")"
+
+# Permitir commits de merge/revert automáticos.
+if printf '%s' "$first_line" | grep -qE '^(Merge|Revert) '; then
+  exit 0
+fi
+
+pattern='^(feat|fix|chore|docs|refactor|style|test)(\(#[0-9]+\))?: .{1,72}$'
+if printf '%s' "$first_line" | grep -qE "$pattern"; then
+  exit 0
+fi
+
+cat >&2 <<'EOF'
+✗ Mensaje de commit inválido.
+  Formato esperado: tipo(#N): descripción   (o)   tipo: descripción
+  tipo ∈ feat | fix | chore | docs | refactor | style | test
+  #N = número de issue de GitHub (opcional)
+  Ejemplos:
+    feat(#12): agrega orquestacion del gateway
+    docs: actualiza el runbook
+EOF
+exit 1
