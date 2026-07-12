@@ -6,6 +6,13 @@ Plataforma académica multimodal de apoyo a la detección temprana de cáncer de
 ## Convenciones de commit
 Mensajes en español: `tipo: descripción breve` (`feat`, `fix`, `chore`, `docs`, `refactor`, `style`, `test`).
 
+## Autoría — sin atribución a IA (regla firme)
+Todo el trabajo es obra del equipo. **En ningún artefacto** (commits, PRs, issues, código,
+comentarios, documentación) debe decir que lo hizo Claude, una IA, un "asistente" o un "agente":
+sin trailer `Co-Authored-By: Claude`, sin `🤖 Generated with`, sin menciones de IA. Antes de
+`git push`, verificar que ningún commit arrastró atribución. Detalle en
+[`docs/psp/conventions.md`](docs/psp/conventions.md#autoría--sin-atribución-a-ia-regla-firme).
+
 ## Datos sensibles (PHI)
 Nunca loguear identificadores de paciente/caso, rutas/nombres de archivos (DICOM/WSI),
 resultados de predicción ni URLs de Storage. Nunca exponer URLs de Storage al cliente

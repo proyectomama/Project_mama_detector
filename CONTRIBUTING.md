@@ -55,6 +55,14 @@ docs: actualiza el runbook con el aprendizaje de pythonpath
 cualquier mensaje que no matchee. Ver [`docs/psp/conventions.md`](docs/psp/conventions.md) para el
 detalle completo.
 
+**Sin atribución a IA — en ningún lado.** Todo es obra del equipo: ni commits, ni PRs, ni issues,
+ni código/comentarios, ni documentación deben decir que lo hizo Claude, una IA, un "asistente" o
+un "agente" (sin `Co-Authored-By: Claude`, sin `🤖 Generated with`). Antes de `git push`:
+
+```bash
+git log origin/main..HEAD --format='%B' | grep -i 'co-authored-by\|generated with' && echo "LIMPIAR ANTES DE PUSH" || echo "ok"
+```
+
 ## 4. Correr los tests
 
 Cada servicio tiene su propia suite (`uv run pytest`). Antes de la primera corrida en una sesión

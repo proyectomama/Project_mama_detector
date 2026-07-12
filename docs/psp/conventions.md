@@ -17,7 +17,6 @@ tipo: descripción
   "agregando" ni "added"), máximo **72 caracteres**, sin punto final.
 - El **cuerpo** del commit (opcional, separado por línea en blanco) explica el **porqué**, no el
   qué — el diff ya muestra el qué. Útil sobre todo para `fix` (causa raíz) y `refactor` (motivo).
-- **Sin atribución a IA/Claude** en ningún commit: son obra del equipo.
 
 Ejemplos válidos:
 
@@ -25,6 +24,30 @@ Ejemplos válidos:
 feat(#12): agrega orquestacion del gateway
 fix(#34): corrige umbral BI-RADS en la fusion mock
 docs: actualiza el runbook con el aprendizaje de pythonpath
+```
+
+## Autoría — sin atribución a IA (regla firme)
+
+Todo el trabajo del repo es **obra del equipo**. **En ningún artefacto** debe figurar que lo hizo
+Claude, una IA, un "asistente", un "agente" ni herramienta similar. Esto aplica a **todo**:
+
+- **Commits:** sin trailer `Co-Authored-By: Claude …`, sin `🤖 Generated with …`, sin mención de IA
+  en asunto ni cuerpo.
+- **Pull Requests e Issues:** título, descripción y comentarios se redactan como trabajo del equipo.
+- **Código y comentarios:** nada de "generado por IA" ni firmas de asistente.
+- **Documentación** (`docs/`, `README`, ADRs, etc.): se escribe en voz del equipo, sin atribución a IA.
+
+Si se usa una herramienta de IA como apoyo, **igual se firma como obra del equipo**. Antes de
+`git push`, verificar que ningún commit arrastró un trailer de atribución:
+
+```bash
+git log origin/main..HEAD --format='%B' | grep -i 'co-authored-by\|generated with' && echo "LIMPIAR ANTES DE PUSH" || echo "ok"
+```
+
+Si aparece, se limpia reescribiendo la historia **local** (aún sin pushear) antes de subir:
+
+```bash
+git filter-branch -f --msg-filter "sed '/Co-Authored-By: Claude/d; /🤖 Generated with/d'" origin/main..HEAD
 ```
 
 ## Hook `commit-msg`
