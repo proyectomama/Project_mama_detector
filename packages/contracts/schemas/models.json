@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MamaContracts",
+  "type": "object",
+  "$defs": {
+    "Prediction": {
+      "type": "object",
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "label": { "type": "string" }
+      },
+      "required": ["score", "label"]
+    },
+    "ModalityResult": {
+      "type": "object",
+      "properties": {
+        "modality": { "type": "string" },
+        "prediction": { "$ref": "#/$defs/Prediction" }
+      },
+      "required": ["modality", "prediction"]
+    },
+    "PredictRequest": {
+      "type": "object",
+      "properties": { "case_ref": { "type": "string" } },
+      "required": ["case_ref"]
+    },
+    "FusionRequest": {
+      "type": "object",
+      "properties": {
+        "results": { "type": "array", "items": { "$ref": "#/$defs/ModalityResult" } }
+      },
+      "required": ["results"]
+    },
+    "FusionResult": {
+      "type": "object",
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "label": { "type": "string" },
+        "contributions": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        }
+      },
+      "required": ["score", "label", "contributions"]
+    },
+    "ClinicalAlert": {
+      "type": "object",
+      "properties": {
+        "case_ref": { "type": "string" },
+        "level": { "type": "string" },
+        "fusion": { "$ref": "#/$defs/FusionResult" }
+      },
+      "required": ["case_ref", "level", "fusion"]
+    }
+  }
+}
