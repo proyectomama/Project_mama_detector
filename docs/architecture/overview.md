@@ -111,10 +111,10 @@ entrenados:
 - Los 5 servicios comparten los contratos generados de `packages/contracts` (ver
   [`contracts.md`](contracts.md)) y se orquestan localmente con `docker-compose`
   (`infra/docker-compose.yml`) vía `just up`.
-- **Tests:** 9/9 pasan en verde en los 5 servicios (`uv run pytest -q` por servicio; ver
-  [`../runbook.md`](../runbook.md)) — 2 por cada servicio de modalidad y fusión (`test_health` +
-  contrato/predicción), 1 en gateway (`test_analyze_orchestrates_modalities_and_fusion`). CI
-  (`.github/workflows/backend.yml`) corre esta misma matriz de tests más la verificación de que
+- **Tests:** 12 pruebas en total — 9 en los 5 servicios (corren en `just test` y CI) + 3 en `packages/contracts` 
+  (aún no wireadas en CI/`just test`). Los 9 de servicios pasan en verde: 2 por cada servicio de modalidad y fusión 
+  (`test_health` + contrato/predicción), 1 en gateway (`test_analyze_orchestrates_modalities_and_fusion`). CI
+  (`.github/workflows/backend.yml`) corre esta matriz de 9 tests más la verificación de que
   los contratos generados no tienen diff contra el schema fuente.
 
 ## 4. Mapeo diseño ↔ implementado ↔ trabajo futuro

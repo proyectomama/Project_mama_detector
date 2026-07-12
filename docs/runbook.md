@@ -57,6 +57,15 @@ Atajo con `just` (corre los 5 servicios en secuencia):
 just test
 ```
 
+Los contratos compartidos tienen su propia suite de tests (3 tests), que se ejecuta por separado:
+
+```bash
+cd packages/contracts
+uv run pytest -q
+```
+
+Nota: `just test` solo corre la matriz de los 5 servicios (9 tests). Para una verificación completa, ejecutar ambos.
+
 ## Generar los contratos compartidos
 
 Los modelos pydantic de `mama_contracts` se generan desde
