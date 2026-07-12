@@ -1,0 +1,33 @@
+services:
+  mammography:
+    build:
+      context: ..
+      dockerfile: services/mammography/Dockerfile
+  histopathology:
+    build:
+      context: ..
+      dockerfile: services/histopathology/Dockerfile
+  genomics:
+    build:
+      context: ..
+      dockerfile: services/genomics/Dockerfile
+  fusion:
+    build:
+      context: ..
+      dockerfile: services/fusion/Dockerfile
+  gateway:
+    build:
+      context: ..
+      dockerfile: services/gateway/Dockerfile
+    ports:
+      - "8080:8000"
+    environment:
+      MAMMOGRAPHY_URL: http://mammography:8000
+      HISTOPATHOLOGY_URL: http://histopathology:8000
+      GENOMICS_URL: http://genomics:8000
+      FUSION_URL: http://fusion:8000
+    depends_on:
+      - mammography
+      - histopathology
+      - genomics
+      - fusion
