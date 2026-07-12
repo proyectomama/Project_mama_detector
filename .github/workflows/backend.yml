@@ -1,0 +1,32 @@
+name: backend
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  contracts-up-to-date:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Regenerar contratos y verificar que no hay diff
+        working-directory: packages/contracts
+        run: |
+          uv sync --group dev
+          ./generate.sh
+          git diff --exit-code python/mama_contracts/models.py
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [mammography, histopathology, genomics, fusion, gateway]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Tests de ${{ matrix.service }}
+        working-directory: services/${{ matrix.service }}
+        run: |
+          uv sync --group dev
+          uv run pytest -q
