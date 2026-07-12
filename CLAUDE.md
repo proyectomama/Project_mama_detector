@@ -51,18 +51,24 @@ Visión completa (diseño vs. implementado): [`docs/architecture/overview.md`](d
   disclaimer clínico, trazabilidad, `Cierra #N`).
 - Flujo completo en [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-## Expertos disponibles
+## Subagentes de revisión (tooling de desarrollo)
 
-Cuatro subagentes read-only (`.claude/agents/`) equivalen 1:1 al sistema multiagente clínico
-exigido por el profesor. Se disparan con slash commands sobre un archivo/PR/módulo
-(`$ARGUMENTS`, o el diff actual si se omite):
+> **Importante:** estos son *subagentes de Claude Code* para usar **mientras se programa** — revisan
+> el código, los PRs y la documentación del repositorio. **NO son componentes de la plataforma
+> desplegada** ni el "sistema multiagente" que exige el profesor. Ese sistema (Agentes Radiólogo,
+> Patólogo, Gobernanza IA, Auditor) corre **en runtime, en la nube, con LangGraph**, analiza casos
+> clínicos reales, y es **trabajo futuro** (RF-004, ver `docs/adr/0005-orquestacion-multiagente-langgraph.md`).
+> Estos subagentes solo **comparten el nombre** de esos roles clínicos; son dos cosas distintas.
 
-| Comando | Experto | Cuándo usarlo |
-|---------|---------|----------------|
-| `/mama-radiologo` | Agente Radiólogo | Plausibilidad clínica de mamografía/tomosíntesis, BI-RADS, densidad, umbrales de riesgo, calidad de Grad-CAM/XAI |
-| `/mama-patologo` | Agente Patólogo | Coherencia de resultados de histopatología, correlación radio-patológica, subtipos/grados |
-| `/mama-gobernanza-ia` | Agente Gobernanza IA | Métricas clínicas objetivo, sesgo poblacional/equidad, calidad de la explicabilidad, fusión multimodal |
-| `/mama-audit` | Agente Auditor regulatorio | Trazabilidad issue↔requisito↔commit, PHI, marco legal CO, 6 principios OMS, cumplimiento de DoD |
+Cuatro subagentes read-only (`.claude/agents/`) disparables con slash commands sobre un
+archivo/PR/módulo (`$ARGUMENTS`, o el diff actual si se omite):
+
+| Comando | Revisa (durante el desarrollo) |
+|---------|--------------------------------|
+| `/mama-radiologo` | Plausibilidad clínica de mamografía/tomosíntesis, BI-RADS, densidad, umbrales de riesgo, calidad de Grad-CAM/XAI |
+| `/mama-patologo` | Coherencia de resultados de histopatología, correlación radio-patológica, subtipos/grados |
+| `/mama-gobernanza-ia` | Métricas clínicas objetivo, sesgo poblacional/equidad, calidad de la explicabilidad, fusión multimodal |
+| `/mama-audit` | Trazabilidad issue↔requisito↔commit, PHI, marco legal CO, 6 principios OMS, cumplimiento de DoD |
 
 Ninguno modifica código: son revisiones. El auditor (`/mama-audit`) además puede correr
 verificaciones read-only (tests/estado) sin modificar nada.

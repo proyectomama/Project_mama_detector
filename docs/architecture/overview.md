@@ -81,10 +81,12 @@ Notas de diseño:
 
 - El **gateway** es la única superficie pública; los servicios de modalidad y fusión viven en red
   interna.
-- Los **4 agentes** (Radiólogo, Patólogo, Gobernanza IA, Auditor regulatorio) son el equivalente
-  funcional del sistema multiagente exigido por el profesor; hoy corresponden 1:1 a los 4
-  subagentes read-only de `.claude/agents/` que auditan el código, y a futuro se implementarán
-  como grafo LangGraph que interviene en el flujo de análisis clínico real (ADR-0005).
+- Los **4 agentes** (Radiólogo, Patólogo, Gobernanza IA, Auditor regulatorio) son el sistema
+  multiagente del **producto** que exige el profesor: correrán **en runtime, en la nube, como grafo
+  LangGraph** que interviene en el flujo de análisis clínico real (ADR-0005). Hoy **no están
+  implementados** (RF-004, trabajo futuro). No confundir con los subagentes de `.claude/agents/`,
+  que llevan los mismos nombres pero son **herramientas de desarrollo** (revisan el repositorio,
+  no forman parte de la plataforma).
 - **Interoperabilidad**: el gateway expone/consume el resultado clínico bajo un contrato alineado
   con HL7 FHIR y SNOMED CT, y acepta estudios en DICOM en la modalidad de mamografía.
 - **Datos**: los estudios (DICOM/WSI) y los resultados de predicción son PHI; solo se referencian

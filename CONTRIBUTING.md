@@ -85,8 +85,10 @@ cumplir la [Definition of Done](docs/psp/definition-of-done.md) completa:
 ## 6. Revisión
 
 Al menos una revisión humana. Si el cambio afecta salida clínica o datos sensibles, además debe
-pasar por el experto correspondiente — los 4 agentes del sistema multiagente están disponibles
-como slash commands en `.claude/commands/`:
+pasar por el subagente de revisión correspondiente. Estos son **herramientas de desarrollo** de
+Claude Code (revisan el repo mientras se programa) — **no** son el sistema multiagente de la
+plataforma (ese es runtime/nube, trabajo futuro; ver `docs/adr/0005-orquestacion-multiagente-langgraph.md`).
+Disponibles como slash commands en `.claude/commands/`:
 
 | Comando | Cuándo usarlo |
 |---|---|

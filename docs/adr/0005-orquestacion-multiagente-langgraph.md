@@ -20,12 +20,15 @@ sobre el caso clínico.
 La orquestación multiagente del flujo clínico real se implementa con **LangGraph**, como grafo de
 cuatro agentes — Radiólogo, Patólogo, Gobernanza IA y Auditor regulatorio — que reciben el
 `FusionResult` y producen el `ClinicalAlert` final, incluyendo el disclaimer clínico obligatorio
-(RNF-008). Estos cuatro agentes coinciden 1:1, por diseño, con los cuatro subagentes read-only ya
-existentes en `.claude/agents/` que hoy auditan código y documentación (accesibilidad, revisión
-clínica de PHI, alcance PSP); esa correspondencia intencional simplifica explicar y defender la
-arquitectura multiagente ante el profesor, aunque los subagentes de Claude Code y el futuro grafo
-LangGraph son artefactos distintos con responsabilidades distintas (uno audita el repositorio, el
-otro interviene en el análisis clínico de un caso).
+(RNF-008). Estos cuatro agentes son **componentes de la plataforma** (runtime, en la nube) y son
+**trabajo futuro**.
+
+**No confundir con el tooling de desarrollo.** En `.claude/agents/` existen cuatro subagentes de
+Claude Code con los mismos nombres (radiólogo, patólogo, gobernanza IA, auditor), pero son una cosa
+distinta: **herramientas de desarrollo** que revisan el repositorio (código, PRs, documentación)
+mientras se programa, y **no forman parte de la plataforma desplegada**. La coincidencia de nombres
+es solo nominal —cada capa tiene responsabilidades distintas: los subagentes auditan el repo; los
+agentes LangGraph intervienen en el análisis clínico de un caso real.
 
 ## Consecuencias
 
