@@ -14,7 +14,7 @@ mejorar. Ver [`psp-methodology.md`](psp-methodology.md) para las fases.
 
 | ID | Fecha | Fase inyección | Fase detección | Tipo (PSP) | Descripción | Fix (commit) | Requisito |
 |----|-------|-----------------|-----------------|------------|--------------|---------------|-----------|
-| D-001 | 2026-07-12 | Design | Test | 20-Environment/Config | Los servicios (`services/*`) importan `app` en sus tests (p. ej. `from app import model`), pero sin declarar `pythonpath = ["."]` en `[tool.pytest.ini_options]` de cada `pyproject.toml`, `uv run pytest` falla con `ModuleNotFoundError: app` al no resolver el paquete desde la raíz del servicio. | `40af3c5` | RNF-004 |
+| D-001 | 2026-07-12 | Design | Test | 20-Environment/Config | Los servicios (`services/*`) importan `app` en sus tests (p. ej. `from app import model`), pero sin declarar `pythonpath = ["."]` en `[tool.pytest.ini_options]` de cada `pyproject.toml`, `uv run pytest` falla con `ModuleNotFoundError: app` al no resolver el paquete desde la raíz del servicio. | `40af3c5` | — |
 
 ## Cómo agregar una fila
 
