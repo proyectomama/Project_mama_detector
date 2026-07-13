@@ -99,17 +99,22 @@ Notas de diseño:
 El andamiaje actual (`services/*` + `packages/contracts`) es un **mock funcional**, no modelos
 entrenados:
 
-- `gateway` (`services/gateway/app/main.py`) expone `POST /cases/{case_ref}/analyze`: llama en
-  paralelo (`asyncio.gather`) a `mammography`, `histopathology` y `genomics` en `POST /predict`,
-  arma un `FusionRequest` con los 3 `ModalityResult`, lo envía a `fusion` (`POST /fuse`) y devuelve
-  un `ClinicalAlert` con `level` (`low|medium|high`, umbralado sobre el score fusionado) y el
-  `FusionResult`.
+- `gateway` (`services/gateway/app/main.py`) expone `POST /analyze` con cuerpo `AnalyzeRequest`
+  (`{case_ref}`): el `case_ref` (PHI) viaja en el cuerpo, **no en la URL**. Llama en paralelo
+  (`asyncio.gather`) a `mammography`, `histopathology` y `genomics` en `POST /predict`, arma un
+  `FusionRequest` con los 3 `ModalityResult`, lo envía a `fusion` (`POST /fuse`) y devuelve un
+  `ClinicalAlert` con un `analysis_id` **opaco generado server-side** (no correlacionable con
+  `case_ref`), el `level` (`low|medium|high`, umbralado sobre el score fusionado) y el
+  `FusionResult`. El `case_ref` **no aparece** en la respuesta ni en logs (RNF-001).
 - `mammography`, `histopathology`, `genomics` (`services/<modalidad>/app/main.py`) exponen cada
   uno `POST /predict`: reciben un `PredictRequest{case_ref}`, corren un `preprocessing.preprocess`
   + `model.predict` stub, y devuelven un `ModalityResult{modality, prediction}`.
 - `fusion` (`services/fusion/app/strategy.py`) implementa la estrategia mock: promedio simple de
-  los `score` de las 3 modalidades, `label = "malignant"` si el promedio ≥ 0.5, y devuelve las
-  `contributions` por modalidad.
+  los `score` de las 3 modalidades, `label = "malignant"` si el promedio **supera** 0.5
+  (`avg > 0.5`, umbral estricto), y devuelve las `contributions` por modalidad. Este umbral es un
+  **placeholder no clínico**: se eligió `> 0.5` para que un promedio de exactamente 0.5 sea
+  `benign` y no contradiga los stubs de modalidad, que devuelven `score=0.1, label="benign"`
+  (ver B-013). Cuando exista un modelo real, el umbral se calibrará con datos de validación.
 - Los 5 servicios comparten los contratos generados de `packages/contracts` (ver
   [`contracts.md`](contracts.md)) y se orquestan localmente con `docker-compose`
   (`infra/docker-compose.yml`) vía `just up`.

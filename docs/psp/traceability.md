@@ -9,7 +9,9 @@
 > · `Commit(s)/PR` (hashes cortos o números de PR que lo implementan) · `Módulo` (dónde vive) ·
 > `Evidencia` (test, métrica medida, revisión clínica) · `Estado` (igual que en `requisitos.md`).
 >
-> En este bootstrap no existen issues todavía: `Issue(s) #N` y `Commit(s)/PR` quedan vacíos (`—`).
+> Los requisitos trabajados en la **Fase 0** ya enlazan su issue (RF-005 → #2, RNF-001 → #3,
+> RNF-002 → #4); el resto queda `—` hasta que se abra su issue. La columna `Commit(s)/PR` se
+> completa en un commit final de trazabilidad con los hashes reales.
 
 ## Requisitos funcionales (RF)
 
@@ -19,7 +21,7 @@
 | RF-002 — Clasificación mamografía 2D (CBIS-DDSM, transfer learning) | — | — | `services/mammography` | — | Propuesto |
 | RF-003 — Explicabilidad Grad-CAM sobre mamografía | — | — | `services/mammography` | — | Propuesto |
 | RF-004 — Orquestación multiagente vía gateway | — | — | `services/gateway` | Test de orquestación del gateway (andamiaje mock) | Implementado parcial |
-| RF-005 — Servicio de fusión multimodal | — | — | `services/fusion` | Tests del andamiaje mock (promedio) | Implementado (mock) |
+| RF-005 — Servicio de fusión multimodal | #2 | `46cb93b` | `services/fusion` | Tests del andamiaje mock (promedio); umbral estricto `avg > 0.5` con caso borderline (tres scores 0.5 → benign) | Implementado (mock) |
 | RF-006 — Correlación histopatológica (BreakHis/TCGA-BRCA) | — | — | `services/histopathology` | — | Propuesto (trabajo futuro) |
 | RF-007 — Endpoint interoperable HL7 FHIR / SNOMED CT | — | — | `services/gateway` | — | Propuesto |
 | RF-008 — Reporte clínico estructurado (BI-RADS, riesgo, disclaimer) | — | — | `services/gateway` | — | Propuesto |
@@ -28,8 +30,8 @@
 
 | Requisito | Issue(s) #N | Commit(s)/PR | Módulo | Evidencia | Estado |
 |-----------|-------------|---------------|--------|-----------|--------|
-| RNF-001 — PHI fuera de logs/respuestas sin signed URL | — | — | transversal | — | Propuesto |
-| RNF-002 — Meta operativa AUC-ROC ≥0.92 (métricas complementarias reportadas) | — | — | `services/mammography` | — | Propuesto |
+| RNF-001 — PHI fuera de logs/respuestas sin signed URL | #3 | `f307868` | `services/gateway`, `packages/contracts` | Pruebas negativas de PHI en gateway (respuesta sin `case_ref`; `analysis_id` opaco ≠ `case_ref`) | Implementado parcial |
+| RNF-002 — Meta operativa AUC-ROC ≥0.92 (métricas complementarias reportadas) | #4 | `c0ac1f1` | `services/mammography` | `docs/alcance-vigente.md` (meta aprobada, evidencia formal pendiente) | Propuesto |
 | RNF-003 — Contratos JSON Schema → pydantic generado, fuente única | — | — | `packages/contracts` | CI verifica diff cero | Implementado |
 | RNF-004 — Commits `tipo(#N): desc` validados por hook | — | — | `.githooks/commit-msg` | `bash .githooks/test-commit-msg.sh` | Implementado |
 | RNF-005 — Equidad y mitigación de sesgo poblacional | — | — | `services/mammography`, `.claude/agents/mama-gobernanza-ia.md` | — | Propuesto |
