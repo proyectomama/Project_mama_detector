@@ -29,7 +29,7 @@
 | Requisito | Issue(s) #N | Commit(s)/PR | Módulo | Evidencia | Estado |
 |-----------|-------------|---------------|--------|-----------|--------|
 | RNF-001 — PHI fuera de logs/respuestas sin signed URL | — | — | transversal | — | Propuesto |
-| RNF-002 — Métricas clínicas objetivo (sens/esp/AUC/recall/BI-RADS) | — | — | `services/mammography` | — | Propuesto |
+| RNF-002 — Meta operativa AUC-ROC ≥0.92 (métricas complementarias reportadas) | — | — | `services/mammography` | — | Propuesto |
 | RNF-003 — Contratos JSON Schema → pydantic generado, fuente única | — | — | `packages/contracts` | CI verifica diff cero | Implementado |
 | RNF-004 — Commits `tipo(#N): desc` validados por hook | — | — | `.githooks/commit-msg` | `bash .githooks/test-commit-msg.sh` | Implementado |
 | RNF-005 — Equidad y mitigación de sesgo poblacional | — | — | `services/mammography`, `.claude/agents/mama-gobernanza-ia.md` | — | Propuesto |
