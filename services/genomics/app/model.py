@@ -3,4 +3,5 @@ from mama_contracts import Prediction
 
 
 def predict(_tensor) -> Prediction:
-    return Prediction(score=0.5, label="benign")
+    # Placeholder no clínico: score bajo coherente con label="benign" (ver B-013).
+    return Prediction(score=0.1, label="benign")

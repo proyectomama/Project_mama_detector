@@ -15,3 +15,12 @@ def test_predict_returns_valid_modality_result():
     result = ModalityResult.model_validate(resp.json())
     assert result.modality == "genomics"
     assert 0.0 <= result.prediction.score <= 1.0
+
+
+def test_stub_prediction_is_benign_placeholder():
+    # El stub mock debe devolver score=0.1/benign (placeholder no clínico, B-013).
+    from app.model import predict
+
+    prediction = predict(None)
+    assert prediction.score == 0.1
+    assert prediction.label == "benign"

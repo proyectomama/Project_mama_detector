@@ -23,3 +23,21 @@ def test_fuse_averages_and_reports_contributions():
     result = FusionResult.model_validate(resp.json())
     assert result.score == 0.6  # (0.8 + 0.4 + 0.6) / 3
     assert set(result.contributions) == {"mammography", "histopathology", "genomics"}
+
+
+def test_borderline_average_is_benign():
+    # Tres scores exactamente en 0.5 dan promedio 0.5. Con el umbral estricto
+    # (avg > 0.5) el resultado es benign; con el antiguo (avg >= 0.5) sería
+    # malignant. Este caso valida el cambio de umbral de B-013.
+    payload = {
+        "results": [
+            {"modality": "mammography", "prediction": {"score": 0.5, "label": "benign"}},
+            {"modality": "histopathology", "prediction": {"score": 0.5, "label": "benign"}},
+            {"modality": "genomics", "prediction": {"score": 0.5, "label": "benign"}},
+        ]
+    }
+    resp = client.post("/fuse", json=payload)
+    assert resp.status_code == 200
+    result = FusionResult.model_validate(resp.json())
+    assert result.score == 0.5
+    assert result.label == "benign"
