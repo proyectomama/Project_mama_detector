@@ -24,6 +24,11 @@
       "properties": { "case_ref": { "type": "string" } },
       "required": ["case_ref"]
     },
+    "AnalyzeRequest": {
+      "type": "object",
+      "properties": { "case_ref": { "type": "string" } },
+      "required": ["case_ref"]
+    },
     "FusionRequest": {
       "type": "object",
       "properties": {
@@ -46,11 +51,11 @@
     "ClinicalAlert": {
       "type": "object",
       "properties": {
-        "case_ref": { "type": "string" },
+        "analysis_id": { "type": "string" },
         "level": { "type": "string" },
         "fusion": { "$ref": "#/$defs/FusionResult" }
       },
-      "required": ["case_ref", "level", "fusion"]
+      "required": ["analysis_id", "level", "fusion"]
     }
   }
 }

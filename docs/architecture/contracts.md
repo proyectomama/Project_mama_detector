@@ -58,7 +58,7 @@ y PR, y falla si hay diferencias contra lo commiteado:
 
 Esto hace imposible mergear un `models.py` desincronizado del schema fuente.
 
-## Los 6 modelos
+## Los 7 modelos
 
 Definidos en `packages/contracts/schemas/models.json` (`$defs`), consumidos vía
 `from mama_contracts import ...`:
@@ -67,10 +67,11 @@ Definidos en `packages/contracts/schemas/models.json` (`$defs`), consumidos vía
 |---|---|---|
 | `Prediction` | Resultado atómico de un modelo de IA para un caso: score de riesgo y etiqueta. | `score` (0–1), `label` |
 | `ModalityResult` | Envuelve la `Prediction` de una modalidad concreta. Es lo que devuelve cada servicio de modalidad en `POST /predict` y lo que el gateway junta antes de fusionar. | `modality` (`mammography`/`histopathology`/`genomics`), `prediction: Prediction` |
-| `PredictRequest` | Petición de predicción que el gateway envía a cada servicio de modalidad. Hoy solo referencia el caso por `case_ref` (PHI); a futuro incorporará la referencia al estudio DICOM/WSI. | `case_ref` |
+| `PredictRequest` | Petición de predicción que el gateway envía a cada servicio de modalidad (**red interna**). Referencia el caso por `case_ref` (PHI); a futuro incorporará la referencia al estudio DICOM/WSI. | `case_ref` |
+| `AnalyzeRequest` | Petición pública que el cliente envía al gateway en `POST /analyze`. Lleva el `case_ref` (PHI) en el **cuerpo**, nunca en la URL (RNF-001). | `case_ref` |
 | `FusionRequest` | Petición que el gateway envía a `fusion`: la lista de resultados de las modalidades ya predichas. | `results: list[ModalityResult]` |
 | `FusionResult` | Resultado del servicio de fusión: score y label combinados, más el desglose de contribución por modalidad (hoy, el peso implícito del promedio). | `score`, `label`, `contributions: dict[str, float]` |
-| `ClinicalAlert` | Salida final del gateway al cliente: el caso, el nivel de alerta clínico y el resultado de fusión. Es donde debe vivir el disclaimer clínico (RNF-008) cuando se implemente. | `case_ref`, `level` (`low`/`medium`/`high`), `fusion: FusionResult` |
+| `ClinicalAlert` | Salida final del gateway al cliente: un `analysis_id` **opaco generado server-side** (no expone `case_ref`, RNF-001), el nivel de alerta clínico y el resultado de fusión. Es donde debe vivir el disclaimer clínico (RNF-008) cuando se implemente. | `analysis_id`, `level` (`low`/`medium`/`high`), `fusion: FusionResult` |
 
 ## Flujo para agregar o cambiar un contrato
 
@@ -86,6 +87,8 @@ Definidos en `packages/contracts/schemas/models.json` (`$defs`), consumidos vía
 
 ## Relación con PHI
 
-`case_ref` (dentro de `PredictRequest` y `ClinicalAlert`) se trata como PHI en todo el sistema: ver
+`case_ref` (dentro de `PredictRequest` y `AnalyzeRequest`) se trata como PHI en todo el sistema. A
+partir de RNF-001, `case_ref` **no** viaja en la URL ni se devuelve al cliente: la salida
+`ClinicalAlert` expone únicamente un `analysis_id` opaco generado server-side. Ver
 [`phi-and-security.md`](phi-and-security.md) para las reglas de logging que aplican a estos
 modelos.

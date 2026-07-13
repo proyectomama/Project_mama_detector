@@ -24,6 +24,10 @@ class PredictRequest(BaseModel):
     case_ref: str
 
 
+class AnalyzeRequest(BaseModel):
+    case_ref: str
+
+
 class FusionRequest(BaseModel):
     results: list[ModalityResult]
 
@@ -35,6 +39,6 @@ class FusionResult(BaseModel):
 
 
 class ClinicalAlert(BaseModel):
-    case_ref: str
+    analysis_id: str
     level: str
     fusion: FusionResult
