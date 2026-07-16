@@ -10,7 +10,8 @@
 > `Evidencia` (test, métrica medida, revisión clínica) · `Estado` (igual que en `requisitos.md`).
 >
 > Los requisitos trabajados en la **Fase 0** ya enlazan su issue (RF-005 → #2, RNF-001 → #3,
-> RNF-002 → #4); el resto queda `—` hasta que se abra su issue. La columna `Commit(s)/PR` se
+> RNF-002 → #4), y el frente de estadificación TNM enlaza los suyos (RF-009 → #6, RF-010 → #7);
+> el resto queda `—` hasta que se abra su issue. La columna `Commit(s)/PR` se
 > completa en un commit final de trazabilidad con los hashes reales.
 
 ## Requisitos funcionales (RF)
@@ -25,6 +26,8 @@
 | RF-006 — Correlación histopatológica (BreakHis/TCGA-BRCA) | — | — | `services/histopathology` | — | Propuesto (trabajo futuro) |
 | RF-007 — Endpoint interoperable HL7 FHIR / SNOMED CT | — | — | `services/gateway` | — | Propuesto |
 | RF-008 — Reporte clínico estructurado (BI-RADS, riesgo, disclaimer) | — | — | `services/gateway` | — | Propuesto |
+| RF-009 — Motor de estadificación TNM (AJCC 8), grupo pronóstico | #6 | — | `services/staging` (nuevo) | — | Aprobado |
+| RF-010 — Estimación de `cT` desde mamografía (mm + incertidumbre) | #7 | — | `services/mammography` | — | Aprobado |
 
 ## Requisitos no funcionales (RNF)
 
