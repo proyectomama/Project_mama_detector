@@ -8,9 +8,9 @@ mejorar. Ver [`psp-methodology.md`](psp-methodology.md) para las fases.
 > **Nota:** las descripciones de esta tabla **no contienen PHI** — sin `case_ref` real, sin rutas
 > de estudios DICOM/WSI reales, sin resultados de predicción reales (ver
 > [`../architecture/phi-and-security.md`](../architecture/phi-and-security.md)). D-001 es de
-> infraestructura/andamiaje; **D-002…D-008 son defectos de diseño clínico** (semántica de categorías
-> TNM y alcance del motor de estadificación): tratan de **definiciones**, no de datos de pacientes,
-> y por eso tampoco contienen PHI.
+> infraestructura/andamiaje; **D-002…D-009 son defectos de diseño clínico** (semántica de categorías
+> TNM, alcance del motor de estadificación y fuentes normativas): tratan de **definiciones**, no de
+> datos de pacientes, y por eso tampoco contienen PHI.
 
 ## Tabla
 
@@ -24,19 +24,32 @@ mejorar. Ver [`psp-methodology.md`](psp-methodology.md) para las fases.
 | D-006 | 2026-07-15 | Design | Design Review | 10-Documentation | **Material educativo tomado como fuente normativa.** Se dio por resuelto el acceso a las tablas mediante láminas educativas del ACS (Hortobagyi P2P, webinar de Gress). Son **no normativas** y **anteriores** a la errata *Critical* del 2018-02-02, que reemplazó el capítulo entero. La fuente normativa es el **capítulo 48 corregido**. Codificar tablas pronósticas desde las láminas habría implementado una edición superada. | — | RF-009 |
 | D-007 | 2026-07-15 | Design | Design Review | 10-Documentation | **Cláusula de licencia leída de más suelto.** Se documentó que bastaba con citar la fuente. El capítulo dice que el contenido no puede *"be sold, distributed, published, or **incorporated into any software**"* sin licencia escrita del ACS: menciona **software** explícitamente. La postura vigente (deuda consciente para el TG académico; evaluación a fondo antes de cualquier alianza clínica) está en ADR-0006. | — | RF-009 |
 | D-008 | 2026-07-15 | Design | Design Review | 80-Function | **Confundir *inferir* con *recibir* (defecto de fondo).** Se concluyó que sin biomarcadores no se podían calcular las tablas pronósticas y que por tanto no debían codificarse. Falso: el motor es una función y no le importa el origen del dato — si grado Nottingham y RE/RP/HER2 entran como **dato estructurado del informe de patología**, el estadio pronóstico se calcula sin ML y sin inferencia, que es como opera cualquier sistema clínico real. **Impacto de alcance:** de este error salían dos corolarios equivocados — que RF-006 (histopatología) era prerrequisito, y que la pregunta de licencia era irrelevante. Es el defecto de mayor alcance de la sesión: de no detectarse, habría recortado el alcance del motor a la tabla anatómica, que es justo la que AJCC 8 desaconseja donde hay biomarcadores (el caso de Colombia). | — | RF-009 |
+| D-009 | 2026-07-15 | Design | Code Review | 10-Documentation | **Fecha y fuente inventadas en `.claude/agents/mama-patologo.md`.** El criterio de revisión mandaba cotejar las tablas pronósticas contra *"el capítulo de mama actualizado (**13-mar-2018**)"* y *"la hoja de erratas de **cancerstaging.org**"*. **Ninguno de los dos datos es real:** el capítulo corregido es *Last updated* **01/25/2018** (pp. 589–636), y la hoja de erratas del ACS está en **facs.org** (`cancerstaging.org` es el dominio viejo del AJCC). Las únicas fechas verificadas son 2018-01-25 (capítulo), 2018-02-02 (errata *Critical*) y 2018-03-29 (typo). **Impacto:** el subagente que revisa estadificación patológica habría mandado a cotejar contra una fuente inexistente — mismo patrón que D-006 (diseñar contra la fuente equivocada), pero agravado: el dato estaba **fabricado**, no solo desactualizado. **Distancia inyección↔detección más larga de la serie:** se escapó de `Design Review` y se detectó recién en `Code Review`, revisando el diff antes de commitear — señal de que la revisión de diseño no verificó las fechas contra la fuente. | — | RF-009 |
 
-## Lectura de D-002…D-008 (frente TNM, 2026-07-15)
+## Lectura de D-002…D-009 (frente TNM, 2026-07-15)
 
-Los siete se **inyectaron en `Design`** y se **detectaron en `Design Review`**, dentro de la misma
-sesión y **antes de llegar a código o al contrato**. Esa distancia inyección↔detección corta es el
-resultado que PSP busca: **ninguno alcanzó `Coding` ni `Testing`**, donde habrían costado bastante
-más — D-002/D-003 habrían quedado congelados en el JSON Schema y en el pydantic generado, y D-008
-habría recortado el alcance del motor antes de que nadie notara por qué.
+**Los ocho se inyectaron en `Design`** y **ninguno alcanzó `Coding` ni `Testing`**, que es el
+resultado que PSP busca: D-002/D-003 habrían quedado congelados en el JSON Schema y en el pydantic
+generado, y D-008 habría recortado el alcance del motor antes de que nadie notara por qué.
 
-Causa raíz común: **se diseñó contra una fuente desactualizada o secundaria** (el Anexo 9 de la GPC,
-que reproduce AJCC 7; láminas educativas previas a la errata *Critical* de 2018-02-02) en vez de
-contra la normativa vigente (capítulo 48 corregido de AJCC 8). Contramedida ya aplicada: ADR-0006
-fija la edición normativa y `docs/clinical/tnm.md` es la fuente clínica única del repo.
+Causa raíz común: **se diseñó contra una fuente desactualizada, secundaria o inexistente** (el Anexo
+9 de la GPC, que reproduce AJCC 7; láminas educativas previas a la errata *Critical* de 2018-02-02;
+y en D-009, una fecha y un dominio directamente fabricados) en vez de contra la normativa vigente
+(capítulo 48 corregido de AJCC 8). Contramedida ya aplicada: ADR-0006 fija la edición normativa y
+`docs/clinical/tnm.md` es la fuente clínica única del repo.
+
+**Dónde se detectaron — la señal a mirar:**
+
+| Detección | Defectos | Lectura |
+|---|---|---|
+| `Design Review` | D-002…D-008 (siete) | Detectados en la **misma sesión** en que se inyectaron, antes de tocar código o contrato. Distancia corta: el caso bueno. |
+| `Code Review` | **D-009** | **Se escapó de `Design Review`** y se detectó recién al revisar el diff antes de commitear. Distancia más larga de la serie. |
+
+D-009 es el más instructivo: la revisión de diseño validó el *razonamiento* clínico pero **no
+verificó las fechas contra la fuente**, y un dato fabricado pasó. Contramedida: los datos
+bibliográficos (fechas, páginas, dominios) se cotejan contra `docs/clinical/tnm.md` o contra la
+fuente primaria, **nunca de memoria** — la misma regla que `docs/anteproyecto/referencias-apa.md`
+aplica marcando con ⚠️ lo no verificado en vez de darlo por bueno.
 
 > **Qué NO es un defecto de esta tabla.** `docs/handoff-tnm-ajcc8.md` §3 marca con ⚠️ cuatro
 > **trampas** —redondeo `T1mi` de la GPC (§3.2), tablas del modelo económico (§3.9), BI-RADS ≠ TNM
