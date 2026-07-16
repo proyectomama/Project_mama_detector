@@ -31,8 +31,10 @@ Visión completa (diseño vs. implementado): [`docs/architecture/overview.md`](d
 | Ruta | Contenido |
 |------|-----------|
 | `docs/requisitos.md` | Catálogo RF/RNF (fuente única de trazabilidad) |
+| `docs/clinical/` | `tnm.md` — estadificación TNM (AJCC 8), qué es inferible desde imagen y qué no, contexto CO (GPC Minsalud, consenso CAC 2025) |
+| `docs/handoff-tnm-ajcc8.md` | Handoff del frente TNM: hallazgos, trampas ya corregidas (`cNX`, `cMX`, redondeo `T1mi`), decisión ADR-0006 y trabajo pendiente |
 | `docs/architecture/` | `overview.md` (diseño completo vs. rebanada implementada), `contracts.md`, `phi-and-security.md` |
-| `docs/adr/` | Decisiones de arquitectura (ADR-0001 a 0005) |
+| `docs/adr/` | Decisiones de arquitectura (ADR-0001 a 0006) |
 | `docs/psp/` | Metodología PSP, convenciones, DoR/DoD, `traceability.md`, `defect-log.md`, plantilla de post-mortem |
 | `docs/runbook.md` | Cómo correr el sistema en local (`uv`, `just up`, `just test`) |
 | `docs/deployment/railway.md` | Borrador de despliegue en Railway |

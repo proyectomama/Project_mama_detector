@@ -1,8 +1,15 @@
 import asyncio
+import uuid
 
 import httpx
 from fastapi import FastAPI
-from mama_contracts import ModalityResult, FusionRequest, FusionResult, ClinicalAlert
+from mama_contracts import (
+    AnalyzeRequest,
+    ModalityResult,
+    FusionRequest,
+    FusionResult,
+    ClinicalAlert,
+)
 from app import config
 
 app = FastAPI(title="gateway-service")
@@ -27,8 +34,11 @@ def health():
     return {"status": "ok"}
 
 
-@app.post("/cases/{case_ref}/analyze", response_model=ClinicalAlert)
-async def analyze(case_ref: str) -> ClinicalAlert:
+@app.post("/analyze", response_model=ClinicalAlert)
+async def analyze(req: AnalyzeRequest) -> ClinicalAlert:
+    # `case_ref` es PHI: se usa solo internamente para consultar las modalidades.
+    # Nunca aparece en la URL, en la respuesta ni en logs (RNF-001).
+    case_ref = req.case_ref
     async with httpx.AsyncClient(timeout=30) as client:
         results = await asyncio.gather(*[
             _predict(client, url, case_ref) for url in config.MODALITY_URLS.values()
@@ -37,4 +47,6 @@ async def analyze(case_ref: str) -> ClinicalAlert:
         resp = await client.post(f"{config.FUSION_URL}/fuse", json=fusion_req.model_dump())
         resp.raise_for_status()
         fusion = FusionResult.model_validate(resp.json())
-    return ClinicalAlert(case_ref=case_ref, level=_level(fusion.score), fusion=fusion)
+    # Identificador opaco generado server-side, no correlacionable con `case_ref`.
+    analysis_id = uuid.uuid4().hex
+    return ClinicalAlert(analysis_id=analysis_id, level=_level(fusion.score), fusion=fusion)

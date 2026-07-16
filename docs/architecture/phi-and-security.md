@@ -5,9 +5,11 @@
 Se trata como **Información de Salud Protegida (PHI)** cualquiera de los siguientes elementos,
 en cualquier servicio (`gateway`, `mammography`, `histopathology`, `genomics`, `fusion`):
 
-- `case_ref` — identificador de caso clínico. Aparece en `PredictRequest` y `ClinicalAlert`
-  (ver [`contracts.md`](contracts.md)). Es PHI aunque parezca un identificador opaco: permite
-  correlacionar un paciente con sus resultados.
+- `case_ref` — identificador de caso clínico. Aparece en `PredictRequest` (red interna) y en
+  `AnalyzeRequest` (cuerpo de la petición pública), pero **nunca en la URL ni en la respuesta**:
+  a partir de RNF-001, la salida `ClinicalAlert` solo expone un `analysis_id` opaco generado
+  server-side (ver [`contracts.md`](contracts.md)). Es PHI aunque parezca un identificador opaco:
+  permite correlacionar un paciente con sus resultados.
 - Rutas y nombres de archivo de estudios **DICOM** (mamografía) y **WSI** (histopatología, whole
   slide images).
 - `result_json` — la predicción de IA en sí (score, label, mapas de explicabilidad): revela
