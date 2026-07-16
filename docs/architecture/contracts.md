@@ -73,6 +73,36 @@ Definidos en `packages/contracts/schemas/models.json` (`$defs`), consumidos vía
 | `FusionResult` | Resultado del servicio de fusión: score y label combinados, más el desglose de contribución por modalidad (hoy, el peso implícito del promedio). | `score`, `label`, `contributions: dict[str, float]` |
 | `ClinicalAlert` | Salida final del gateway al cliente: un `analysis_id` **opaco generado server-side** (no expone `case_ref`, RNF-001), el nivel de alerta clínico y el resultado de fusión. Es donde debe vivir el disclaimer clínico (RNF-008) cuando se implemente. | `analysis_id`, `level` (`low`/`medium`/`high`), `fusion: FusionResult` |
 
+## Tipo de estadificación TNM (diseñado, aún no en el schema)
+
+RF-009 (#6) introduce un tipo de **estadificación TNM (AJCC 8)** en `models.json`. Todavía **no está
+en el schema**: lo que sigue es el diseño acordado en
+[`../adr/0006-estadificacion-tnm-ajcc8-pronostica.md`](../adr/0006-estadificacion-tnm-ajcc8-pronostica.md),
+para que quien lo implemente no rehaga las decisiones. La fuente clínica es
+[`../clinical/tnm.md`](../clinical/tnm.md).
+
+**Campos:** `cT`/`cN`/`cM`, **grado Nottingham**, **RE**, **RP**, **HER2**, y **contexto de
+tratamiento**.
+
+**Reglas que el contrato debe hacer cumplir** — cada una corrige un error concreto:
+
+| Regla | Por qué |
+|---|---|
+| **`cMX` no existe.** Las únicas categorías M válidas son `cM0`, `cM1`, `pM1`. Un contrato que acepte `cMX` está **mal formado**. `pM0` tampoco es válido: todo `M0` es clínico. | AJCC 8 no define `MX` para mama. |
+| **`cNX` ≠ "no evaluado".** AJCC 8 lo reserva para cuando la **cuenca ganglionar fue extirpada**. Si nadie evaluó la axila, la categoría es **ausente** (`null`/`"unknown"`), no `cNX`. | `cN0` es una afirmación **positiva**: la evaluación se hizo y salió negativa. |
+| **Dato ausente = `null`/`"unknown"`, nunca `X`.** | Ver las dos filas anteriores. |
+| **`contexto de tratamiento` es obligatorio.** Decide si aplica la tabla **clínica** o la **patológica**. | Las dos tablas dan resultados **distintos** para la misma combinación: no es un detalle opcional. |
+| **Sin valores por defecto para `cM0`/`cN0`.** Ante entrada obligatoria ausente → **"estadio no determinable"**. | Un `M0`/`N0` asumido por silencio convierte "no sabemos" en "no hay enfermedad": **fabrica un hallazgo clínico**. Es el modo de fallo más peligroso del tipo. |
+| **`cT` estimado ≠ `pT`.** Si `cT` viene de imagen (RF-010), va marcado como **estimación radiológica** con incertidumbre y prefijo `c`. | El prefijo `p` exige pieza patológica. |
+| **Casos sin grupo asignable** se representan explícitamente: grado nuclear (no Nottingham), posneoadyuvancia (`ypT`/`ypN`), respuesta patológica completa. | Forzar un valor sería inventar un estadio. |
+
+**Origen del dato:** grado, RE, RP y HER2 entran como **dato estructurado del informe de patología** —
+el sistema los **recibe**, no los infiere. El estadio pronóstico **no necesita un modelo**: necesita
+**un campo en el contrato**. En particular, **RF-006 (histopatología) no es prerrequisito** de RF-009.
+
+**PHI:** este tipo transporta datos clínicos sensibles. Aplican las mismas reglas que a `case_ref`
+(ver más abajo y [`phi-and-security.md`](phi-and-security.md)): no se loguea.
+
 ## Flujo para agregar o cambiar un contrato
 
 1. Editar `packages/contracts/schemas/models.json` (agregar/modificar el `$defs` correspondiente;

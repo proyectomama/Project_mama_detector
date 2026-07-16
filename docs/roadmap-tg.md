@@ -103,6 +103,37 @@ protocolo/dataset no la habilita.
 
 **Salida:** modelo baseline, pesos/versiones registrados, reporte de evaluación y ejemplos XAI.
 
+### Frente paralelo — Estadificación TNM (AJCC 8)
+
+**No desplaza la Fase 1 ni ninguna otra fase.** Nace de la solicitud del director del 2026-07-15 de
+*identificar y validar el TNM*. Decisión en ADR-0006; requisitos **RF-009** (#6) y **RF-010** (#7).
+
+**Por qué es un frente paralelo y no una fase:** el motor de estadificación es **determinista, sin
+ML**, y está **desacoplado** del modelo de mamografía — recibe datos clínicos estructurados y
+calcula. No compite por el recurso escaso de la Fase 1 (entrenamiento y protocolo de evaluación) ni
+depende de él.
+
+**Secuencia, por dependencia:**
+
+1. **Contrato primero.** El tipo de estadificación entra en `packages/contracts/schemas/models.json`
+   junto con la **Fase 2**, que ya toca contratos. Sin contrato no hay motor.
+2. **Motor después** (RF-009), con **cobertura exhaustiva** de la tabla de verdad.
+3. **Estimación de `cT`** (RF-010) **solo cuando exista el baseline de la Fase 1**: es la única pieza
+   del frente que toca el pipeline de mamografía (requiere segmentación y `PixelSpacing`).
+
+**Límites que este frente no cruza** — son parte del entregable, no advertencias:
+
+- **No se afirma que se "valida el TNM" con CBIS-DDSM:** el dataset **no tiene etiquetas TNM**.
+- **No se infiere `cN` ni `cM`** desde una mamografía; sin `N` ni `M` **no hay estadio**.
+- **El motor se dispara sobre cáncer confirmado por biopsia**, nunca sobre la salida del modelo.
+- **La meta AUC-ROC ≥0.92 no aplica aquí:** un motor determinista no tiene AUC. Su evidencia es
+  cobertura exhaustiva, no métrica estadística.
+
+**Salida:** motor verificado por tabla de verdad completa + tipo de contrato + `docs/clinical/tnm.md`
+como fuente clínica. **Valor académico añadido:** es verificación **completa** —no muestreo—, y
+contrasta a propósito con la evaluación estadística del modelo de mamografía: dos formas distintas de
+evidencia en un mismo TG, un artefacto PSP excepcionalmente fuerte.
+
 ### Fase 2 — Contrato e interoperabilidad clínica demostrable
 
 **Objetivo:** reemplazar contratos genéricos por una interfaz demostrable y segura.
@@ -176,6 +207,12 @@ o validarse en la siguiente revisión:
 4. Objetivo operativo **AUC-ROC >=0.92** y definición de las demás métricas/criterios de éxito.
 5. Definición mínima de DICOM, FHIR y SNOMED para una demostración académica.
 6. Forma de evaluar la entrega: resultados, demo, revisión clínica, diagramas y evidencia PSP/TSP/PMBOK.
+7. **Alcance del TNM (ADR-0006, aceptada por el equipo el 2026-07-15 — no por el director).** Debe
+   quedar explícito que el sistema **no puede inferir el TNM desde una mamografía** (`cN` no es
+   inferible; `cM0` es juicio clínico) y que **no se valida TNM contra CBIS-DDSM** (no tiene esas
+   etiquetas). Lo que sí se entrega: un motor **determinista** que **calcula** el estadio pronóstico
+   con datos clínicos **recibidos**, más una **propuesta** de `cT` desde imagen. Se adopta **AJCC 8**
+   (el Anexo 9 de la GPC del Minsalud reproduce AJCC 7).
 
 ## Decisiones operativas resueltas
 
@@ -187,12 +224,20 @@ o validarse en la siguiente revisión:
 | Interoperabilidad | DICOM de entrada y `DiagnosticReport` FHIR + `Observation` SNOMED CT de salida |
 | Interfaz | Reutilizar al máximo el dashboard existente, sin crear otro producto desde cero |
 | Horizonte | El anteproyecto debe completarse en menos de 15 días; el roadmap técnico mantiene su alcance |
+| Estadificación TNM | **AJCC 8** (no el Anexo 9 de la GPC, que es AJCC 7). Se implementa la tabla **pronóstica**, no solo la anatómica: el motor **recibe** grado Nottingham + RE/RP/HER2 como dato estructurado. Determinista, sin ML, desacoplado del modelo (ADR-0006) |
 
 ## Única evidencia pendiente
 
 Localizar o registrar la evidencia de aprobación del director para el alcance y AUC-ROC >=0.92. Si
 la aprobación fue verbal, crear una minuta o enviar un correo de recapitulación para que quede un
 registro verificable.
+
+**Oportunidad de doble propósito:** ya existe un **hilo vivo** con el director (correo del
+2026-07-15, asunto TNM), todavía **sin responder**. Responder ese hilo con la **delimitación del
+TNM** (punto 7 de las aprobaciones) **más** la **recapitulación del alcance y de AUC-ROC >=0.92**
+cierra **ambas cosas de una vez**: es la misma evidencia que necesitan RNF-002 y ADR-0006. Sin
+reproducir datos personales del hilo en el repositorio (Ley 1581/2012): citarlo por **fecha y
+asunto**.
 
 ## Criterio de finalización del roadmap
 
@@ -210,3 +255,8 @@ reproducible. No se debe declarar uso asistencial, validación colombiana ni cer
   con evidencia o aprobación pertinente.
 - `docs/alcance-vigente.md` — referencia interna del alcance vigente y de la meta AUC-ROC ≥0.92
   (aprobada, evidencia pendiente); no reescribe los documentos históricos del profesor.
+- `docs/adr/0006-estadificacion-tnm-ajcc8-pronostica.md` — decisión de estadificación TNM (AJCC 8,
+  tabla pronóstica); aceptada por el equipo, pendiente de validación del director.
+- `docs/clinical/tnm.md` — fuente clínica única de TNM: qué es inferible desde imagen y qué no.
+- `docs/handoff-tnm-ajcc8.md` — continuidad del frente TNM: hallazgos, trampas ya corregidas y
+  trabajo pendiente.

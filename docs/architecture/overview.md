@@ -138,12 +138,47 @@ entrenados:
 | Explicabilidad (XAI) | Grad-CAM / mapas de atención en toda alerta de riesgo | Propuesto | RF-003 |
 | Aprendizaje federado | Entrenamiento colaborativo entre instituciones | No iniciado | Fuera de alcance del TG |
 | Contratos compartidos | JSON Schema → pydantic generado | **Implementado** | — |
-| Tests automatizados | Cobertura de contrato por servicio | **Implementado**: 9/9 en verde | Ampliar cobertura al crecer la lógica real |
+| Estadificación TNM (AJCC 8) | Motor **determinista dirigido por tabla**, sin ML: recibe datos clínicos estructurados y calcula el grupo pronóstico | **Propuesto**: decidido (ADR-0006), sin código ni schema | Motor + cobertura exhaustiva de la tabla de verdad (RF-009, #6) |
+| Estimación de `cT` desde imagen | Diámetro mayor en mm + incertidumbre, requiere `PixelSpacing` | **Propuesto** | Segmentación de lesión + lectura DICOM (RF-010, #7) |
+| Tests automatizados | Cobertura de contrato por servicio | **Implementado**: 18/18 en verde (contratos 4 · fusion 3 · gateway 2 · genomics 3 · histopathology 3 · mammography 3), verificado el 2026-07-15 | Ampliar cobertura al crecer la lógica real |
+
+### 4.1 Dónde encaja el motor de estadificación (y dónde **no**)
+
+El motor de estadificación (RF-009) es **una función desacoplada**, no un paso más del pipeline de
+mamografía. La distinción es clínica, no de diseño:
+
+> **El motor se dispara sobre un cáncer confirmado por biopsia, nunca sobre la salida del modelo.**
+> La plataforma detecta **sospecha**; estadificar porque el modelo dijo `malignant` sería
+> precisamente el error a evitar. **No existe función BI-RADS → estadio**: BI-RADS gradúa la
+> sospecha de un estudio de imagen, TNM describe la extensión anatómica de un cáncer **ya
+> diagnosticado**.
+
+Consecuencias para el mapa de arriba:
+
+- **El motor no cuelga del gateway de análisis.** No recibe una `Prediction` ni un `FusionResult`:
+  recibe `cT`/`cN`/`cM`, grado Nottingham, RE, RP, HER2 y el **contexto de tratamiento**, todos como
+  **dato estructurado** de origen clínico. Los **recibe**; no los infiere ni los mide.
+- **No depende de RF-006** (histopatología). El estadio pronóstico no necesita un modelo que infiera
+  biomarcadores: necesita **un campo en el contrato**. Confundir *inferir* con *recibir* es el error
+  de fondo que esta separación evita.
+- **No tiene AUC.** Al ser determinista, se verifica por **cobertura exhaustiva de la tabla de
+  verdad**, no por métrica estadística. No se valida contra CBIS-DDSM, que **no tiene etiquetas
+  TNM**.
+- **La única pieza que sí toca el pipeline** es la estimación de `cT` (RF-010), que sale marcada
+  como estimación radiológica con prefijo `c` — nunca `pT`. `cN` y `cM` **no son inferibles** desde
+  una mamografía, y sin `N` ni `M` **no hay estadio**.
+- **Sube el perfil regulatorio:** emitir un estadio es afirmación clínica de mayor riesgo que un
+  triaje (RNF-006 INVIMA, RNF-007 OMS).
+
+Detalle clínico en [`../clinical/tnm.md`](../clinical/tnm.md); decisión en
+[`../adr/0006-estadificacion-tnm-ajcc8-pronostica.md`](../adr/0006-estadificacion-tnm-ajcc8-pronostica.md).
 
 ## 5. Enlaces
 
 - [`contracts.md`](contracts.md) — contratos compartidos (`packages/contracts`).
 - [`phi-and-security.md`](phi-and-security.md) — PHI, logging, marco legal CO, ética.
+- [`../clinical/tnm.md`](../clinical/tnm.md) — estadificación TNM (AJCC 8): qué es inferible desde
+  imagen y qué no.
 - [`../requisitos.md`](../requisitos.md) — catálogo RF/RNF y su estado real.
 - [`../runbook.md`](../runbook.md) — cómo correr el sistema en local.
 - [`../deployment/railway.md`](../deployment/railway.md) — borrador de despliegue.

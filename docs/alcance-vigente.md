@@ -49,7 +49,42 @@ AUC-ROC ≥ 0.92. **Falta registrar la evidencia formal** de esa aprobación (co
 recapitulación, sin reproducir datos personales). Hasta registrarla, la meta vive como **requisito**
 (RNF-002, estado `Propuesto`) pero su aprobación no está aún soportada por evidencia verificable.
 
-## 5. Documentos relacionados
+## 5. Estadificación TNM — función desacoplada (no altera este alcance)
+
+Tras la solicitud del director del 2026-07-15 de *identificar y validar el TNM*, se decidió adoptar
+**AJCC 8** e implementar un motor de estadificación (ADR-0006; RF-009 → #6, RF-010 → #7).
+
+> **Mismo estado de evidencia que §4 — no confundir.** ADR-0006 está **aceptada por el equipo el
+> 2026-07-15, no por el director**: él **aún no ha respondido** el hilo del 2026-07-15. Igual que la
+> meta de §4, este alcance espera evidencia registrada. Y es la **misma** evidencia: responder ese
+> hilo cierra ambas.
+
+**Este frente no modifica el alcance de arriba**, y conviene ser explícito sobre por qué:
+
+- **No cambia la tarea clínica primaria** (§1): la plataforma sigue haciendo **triaje de sospecha**
+  en mamografía. El motor de estadificación se dispara sobre un cáncer **ya confirmado por biopsia**,
+  no sobre la salida del modelo. Estadificar porque el modelo dijo `malignant` sería exactamente el
+  error a evitar.
+- **No cambia la meta operativa** (§4): AUC-ROC ≥0.92 mide el **triaje** sobre CBIS-DDSM. El motor de
+  estadificación es **determinista, sin ML**, y por tanto **no tiene AUC**: se verifica por
+  **cobertura exhaustiva de la tabla de verdad**, no por métrica estadística. Son dos formas de
+  evidencia distintas y no se mezclan.
+- **No se valida TNM contra CBIS-DDSM**: el dataset **no tiene etiquetas TNM**, ni ganglionares, ni
+  de metástasis, ni biomarcadores. Afirmar "validamos el TNM" con CBIS-DDSM sería del mismo tipo de
+  defecto que afirmar una métrica no medida.
+- **La rebanada vertical (§2) no crece por esto.** El motor es una función **desacoplada** del
+  pipeline de mamografía: recibe datos clínicos estructurados y calcula.
+
+**La única excepción:** la **estimación de `cT`** (RF-010) **sí toca el pipeline de mamografía**
+—requiere segmentación de la lesión y `PixelSpacing` del DICOM— y sale marcada como **estimación
+radiológica** con prefijo `c`, nunca `pT`. `cN` y `cM` **no son inferibles** desde una mamografía, y
+sin `N` ni `M` no hay estadio.
+
+**Sobre el perfil regulatorio:** emitir un estadio es una afirmación clínica de **mayor riesgo que un
+triaje** y sube el perfil SaMD ante INVIMA (ver notas en RNF-006/RNF-007 de
+[`requisitos.md`](requisitos.md)). Detalle clínico en [`clinical/tnm.md`](clinical/tnm.md).
+
+## 6. Documentos relacionados
 
 - [`roadmap-tg.md`](roadmap-tg.md) — roadmap de corrección y entrega por fases.
 - [`auditoria-alineacion-profesor.md`](auditoria-alineacion-profesor.md) — brechas frente al alcance
@@ -57,3 +92,7 @@ recapitulación, sin reproducir datos personales). Hasta registrarla, la meta vi
 - [`requisitos.md`](requisitos.md) — catálogo RF/RNF (RNF-002 registra la meta AUC-ROC ≥ 0.92).
 - [`anteproyecto/propuesta-alcance-tg.md`](anteproyecto/propuesta-alcance-tg.md) — propuesta de
   alcance (documento histórico, no se reescribe aquí).
+- [`adr/0006-estadificacion-tnm-ajcc8-pronostica.md`](adr/0006-estadificacion-tnm-ajcc8-pronostica.md)
+  — decisión de estadificación TNM (AJCC 8, tabla pronóstica). Ver §5.
+- [`clinical/tnm.md`](clinical/tnm.md) — fuente clínica única de TNM: qué es inferible desde imagen
+  y qué no.
